@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SampleLegacyServices\IService1.cs" Link="IService1.cs"/>
+    <Content Include="..\SampleLegacyServices\Service1.svc" Link="Service1.svc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="..\SampleLegacyServices\Service1.svc.cs" Link="Service1.svc.cs"/>
+    <Content Include="..\SampleLegacyServices\WebService1.asmx" Link="WebService1.asmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="..\SampleLegacyServices\WebService1.asmx.cs" Link="WebService1.asmx.cs"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LegacyMockLib\LegacyMockLib.csproj" />
+  </ItemGroup>
+
+</Project>
