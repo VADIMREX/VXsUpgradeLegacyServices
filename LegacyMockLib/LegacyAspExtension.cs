@@ -1,10 +1,27 @@
 namespace LegacyMockLib;
 
 using System.Reflection;
+using System.ServiceModel;
+using System.Web.Services;
+
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
+
+using LegacyMockLib.Svc;
 
 public static class LegacyAspExtension {
     public static IEndpointRouteBuilder UseLegacyAsp(this IEndpointRouteBuilder app, Assembly aspAssembly, string aspFolder) {
+        var fileClasses = AspParser.ParseDirectory(aspFolder);
+        foreach(var type in aspAssembly.GetTypes()) {
+            if (type.IsInterface) continue;
+            var attributeInfo = type.GetCustomAttributeRecursevely<ServiceContractAttribute>();
+            if (null != attributeInfo) {
+                var (serviceContract, serviceContractType) = attributeInfo.Value;
+                new ServiceContractWrapper(type, serviceContract, serviceContractType, app, fileClasses.ContainsKey(type.FullName) ? fileClasses[type.FullName].ToArray() : new string[0]) ;
+            }
+            var webServices = type.GetCustomAttributesRecursevely<WebServiceAttribute>().ToArray();
+            if (0 != webServices.Length) ;
+        }
         return app;
     }
 
