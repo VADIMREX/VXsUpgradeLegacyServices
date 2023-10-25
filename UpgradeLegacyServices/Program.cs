@@ -1,3 +1,5 @@
+using LegacyMockLib;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,11 +20,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
-var a = new LegacyMockLib.AspParser();
-var data = a.ParseWorkDirectory();
+app.Use(request => {
+    Console.WriteLine($$"""
+    Incoming request:
+    - Target: {{request.Target?.GetType().Name ?? "null"}}
+    - Method: {{request.Method?.Name ?? "null"}}
+    """);
+    return request;
+});
+
+app.UseLegacyAsp();
 
 app.Run();
