@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Routing;
 
 public static class LegacyAspExtension {
     public static IEndpointRouteBuilder UseLegacyAsp(this IEndpointRouteBuilder app, Assembly aspAssembly, string aspFolder) {
-        var parser = new AspParser(aspAssembly, aspFolder);
         return app;
     }
 
