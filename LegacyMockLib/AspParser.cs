@@ -144,17 +144,19 @@ public class AspParser {
         return (buff, type);
     }
 
-    /// <summary> Recursevely parse <paramref name="directory"/> with dictionary to be populated corresponding file path with class name </summary>
+    /// <summary> Recursevely parse <paramref name="directory"/> with dictionary to be populated corresponding class name with file path </summary>
     /// <param name="directory">Path to the directory</param>
-    /// <param name="fileClass">Dictionary to be populated corresponding file path with class name </param>
-    /// <returns> Dictionary corresponding file path with class name </returns>
-    public static Dictionary<string, string> ParseDirectory(string rootPath, DirectoryInfo directory, Dictionary<string, string> fileClass) {
+    /// <param name="fileClass">Dictionary to be populated corresponding class name with file path </param>
+    /// <returns> Dictionary corresponding class name with file path </returns>
+    public static Dictionary<string, List<string>> ParseDirectory(string rootPath, DirectoryInfo directory, Dictionary<string, List<string>> fileClass) {
         foreach(var fi in directory.GetFiles()) {
             if (".svc" != fi.Extension && ".asmx" != fi.Extension) continue;
             using var sr = fi.OpenText();
             var s = sr.ReadToEnd();
             var (className, _) = ParseAspFile(s);
-            fileClass.Add(className, fi.FullName.Replace(rootPath, ""));
+
+            if (!fileClass.ContainsKey(className)) fileClass.Add(className, new List<string>());
+            fileClass[className].Add(fi.FullName.Replace(rootPath, ""));
         }
         foreach(var subdi in directory.GetDirectories())
             fileClass = ParseDirectory(rootPath, subdi, fileClass);
@@ -163,9 +165,9 @@ public class AspParser {
 
     /// <summary> Recursevely parse directory at specified <paramref name="path"/></summary>
     /// <param name="path">Path to the directory</param>
-    /// <returns> Dictionary corresponding file path with class name </returns>
-    public static Dictionary<string, string> ParseDirectory(string path) {
+    /// <returns> Dictionary corresponding class name with file path </returns>
+    public static Dictionary<string, List<string>> ParseDirectory(string path) {
         var di = new DirectoryInfo(path);
-        return ParseDirectory(path, di, new Dictionary<string, string>());
+        return ParseDirectory(path, di, new Dictionary<string, List<string>>());
     }
 }
