@@ -16,6 +16,19 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.Use(async (context, next) => {
+        Console.WriteLine($$"""
+        Incoming request:
+        - Path: {{context.Request.Path}}
+        """);
+
+        Endpoint? endpoint = context.GetEndpoint();
+ 
+        if (endpoint != null) Console.WriteLine("- No endpoint");
+
+        await next();
+    });
 }
 
 app.UseHttpsRedirection();
@@ -25,15 +38,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.Use(request => {
-    Console.WriteLine($$"""
-    Incoming request:
-    - Target: {{request.Target?.GetType().Name ?? "null"}}
-    - Method: {{request.Method?.Name ?? "null"}}
-    """);
-    return request;
-});
 
 app.UseLegacyAsp();
 
