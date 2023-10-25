@@ -148,24 +148,24 @@ public class AspParser {
     /// <param name="directory">Path to the directory</param>
     /// <param name="fileClass">Dictionary to be populated corresponding file path with class name </param>
     /// <returns> Dictionary corresponding file path with class name </returns>
-    public static Dictionary<string, string> ParseDirectory(DirectoryInfo directory, Dictionary<string, string> fileClass) {
+    public static Dictionary<string, string> ParseDirectory(string rootPath, DirectoryInfo directory, Dictionary<string, string> fileClass) {
         foreach(var fi in directory.GetFiles()) {
             if (".svc" != fi.Extension && ".asmx" != fi.Extension) continue;
             using var sr = fi.OpenText();
             var s = sr.ReadToEnd();
             var (className, _) = ParseAspFile(s);
-            fileClass.Add(fi.FullName.Replace(directory.FullName, ""), className);
+            fileClass.Add(className, fi.FullName.Replace(rootPath, ""));
         }
         foreach(var subdi in directory.GetDirectories())
-            fileClass = ParseDirectory(subdi, fileClass);
+            fileClass = ParseDirectory(rootPath, subdi, fileClass);
         return fileClass;
     }
 
     /// <summary> Recursevely parse directory at specified <paramref name="path"/></summary>
     /// <param name="path">Path to the directory</param>
     /// <returns> Dictionary corresponding file path with class name </returns>
-    public Dictionary<string, string> ParseDirectory(string path) {
+    public static Dictionary<string, string> ParseDirectory(string path) {
         var di = new DirectoryInfo(path);
-        return ParseDirectory(di, new Dictionary<string, string>());
+        return ParseDirectory(path, di, new Dictionary<string, string>());
     }
 }
