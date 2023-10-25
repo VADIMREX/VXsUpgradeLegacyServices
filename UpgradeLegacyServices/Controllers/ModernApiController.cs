@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UpgradeLegacyServices;
 
+public record ListItem(int no, string name);
+
 [ApiController]
 [Route("[controller]")]
 public class ModernApiController : ControllerBase {
@@ -13,10 +15,10 @@ public class ModernApiController : ControllerBase {
     }
 
     [HttpGet(Name = "Sample Get")]
-    public IEnumerable<(int no, string name)> Get() {
+    public IEnumerable<ListItem> Get() {
         _logger.LogInformation("Sample Get start");
-        foreach(var data in Enumerable.Range(1, 5).Select(index => (index, DateTime.Now.AddMonths(index).ToString("MMMM")))) 
-            yield return data;
+        for(int i = 0; i < 5; i++)
+            yield return new ListItem(i + 1, DateTime.Now.AddMonths(i).ToString("MMMM"));
         _logger.LogInformation("Sample Get end");
     }
 }
