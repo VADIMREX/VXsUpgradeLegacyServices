@@ -38,16 +38,20 @@ public class ServiceContractWrapper
             if (null == baseMethod) continue;
             var attr = baseMethod.GetCustomAttribute<OperationContractAttribute>();
             if (null == attr) continue;
-            methods.Add(mi.Name, new OperationContractWrapper(mi, attr, baseMethod, app, pathes));
+            methods.Add($"{mi.Name}/{mi.Name}", new OperationContractWrapper(mi, attr, baseMethod, app, pathes));
         }
     }
 
     async Task ProcessMethod(HttpContext context) {
-        if ("text/xml" != context.Request.ContentType) {
+        if (!context.Request
+                    .ContentType
+                    ?.Split(";", StringSplitOptions.TrimEntries)
+                    .Contains("text/xml") ?? false) {
             context.Response.StatusCode = 415;
             return;
         }
         var soapAction = context.Request.Headers["SOAPAction"];
+
         await context.Response.WriteAsync($$"""
             <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
               <s:Body>

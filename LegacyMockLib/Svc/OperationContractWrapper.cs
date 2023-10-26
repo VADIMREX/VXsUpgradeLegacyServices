@@ -64,7 +64,7 @@ public class OperationContractWrapper
                                     method: "POST",
                                     headers: {
                                         "Content-Type": "text/xml;charset=UTF-8",
-                                        "SOAPAction": '"http://tempuri.org/IService1/{{method.Name}}"'
+                                        "SOAPAction": '"http://tempuri.org/IServiceBase/{{method.Name}}"'
                                     },
                                     body: value
                                 });
