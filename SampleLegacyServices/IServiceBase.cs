@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LegacyServices {
     [ServiceContract]
-    public interface IService1 {
+    public interface IServiceBase {
         [OperationContract]
         string GetData(int value);
 

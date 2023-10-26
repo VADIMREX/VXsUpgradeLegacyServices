@@ -12,15 +12,36 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\SampleLegacyServices\IService1.cs" Link="IService1.cs"/>
-    <Content Include="..\SampleLegacyServices\Service1.svc" Link="Service1.svc">
+    <Compile Include="..\SampleLegacyServices\IServiceBase.cs" Link="IServiceBase.cs"/>
+    <Compile Include="..\SampleLegacyServices\IServiceImplicit.cs" Link="IServiceImplicit.cs"/>
+    <Compile Include="..\SampleLegacyServices\ServiceBase.svc.cs" Link="ServiceBase.svc.cs"/>
+    <Compile Include="..\SampleLegacyServices\ServiceImplicit.svc.cs" Link="ServiceImplicit.svc.cs"/>
+    <Content Include="..\SampleLegacyServices\ServiceBase.svc" Link="ServiceBase.svc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="..\SampleLegacyServices\Service1.svc.cs" Link="Service1.svc.cs"/>
-    <Content Include="..\SampleLegacyServices\WebService1.asmx" Link="WebService1.asmx">
+    <Content Include="..\SampleLegacyServices\ServiceImplicit.svc" Link="ServiceImplicit.svc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="..\SampleLegacyServices\WebService1.asmx.cs" Link="WebService1.asmx.cs"/>
+    <Content Include="..\SampleLegacyServices\Services\Svc\Service1.svc" Link="Services\Svc\Service1.svc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SampleLegacyServices\Services\Svc\Service2.svc" Link="Services\Svc\Service2.svc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="..\SampleLegacyServices\WebServiceBase.asmx.cs" Link="WebServiceBase.asmx.cs"/>
+    <Compile Include="..\SampleLegacyServices\WebServiceImplicit.asmx.cs" Link="WebServiceImplicit.asmx.cs"/>
+    <Content Include="..\SampleLegacyServices\WebServiceBase.asmx" Link="WebServiceBase.asmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SampleLegacyServices\WebServiceImplicit.asmx" Link="WebServiceImplicit.asmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SampleLegacyServices\Services\Asmx\WebService1.asmx" Link="Services\Asmx\WebService1.asmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SampleLegacyServices\Services\Asmx\WebService2.asmx" Link="Services\Asmx\WebService2.asmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

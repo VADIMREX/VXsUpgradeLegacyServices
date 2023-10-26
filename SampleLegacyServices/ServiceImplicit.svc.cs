@@ -7,13 +7,14 @@ using System.ServiceModel.Web;
 using System.Text;
 
 namespace LegacyServices {
-    public class Service1 : IService1
+    public class ServiceImplicit : IServiceImplicit
     {
         public string GetData(int value) {
             return string.Format("You entered: {0}", value);
         }
 
-        public CompositeType GetDataUsingDataContract(CompositeType composite) {
+        public CompositeTypeImplicit GetDataUsingDataContract(CompositeTypeImplicit composite)
+        {
             if (composite == null) {
                 throw new ArgumentNullException("composite");
             }
@@ -22,5 +23,6 @@ namespace LegacyServices {
             }
             return composite;
         }
+
     }
 }

@@ -9,7 +9,7 @@ namespace LegacyServices {
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     // [System.Web.Script.Services.ScriptService]
-    public class WebService1 : WebService {
+    public class WebServiceImplicit : WebService {
         [WebMethod]
         public string HelloWorld() {
             return "Hello World";
