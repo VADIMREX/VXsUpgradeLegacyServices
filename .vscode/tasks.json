@@ -5,7 +5,9 @@
             "label": "build-legacy",
             "command": "msbuild",
             "type": "shell",
-            "args": [],
+            "args": [
+                "${workspaceFolder}/SampleLegacyServices/SampleLegacyProject.csproj"
+            ],
             "problemMatcher": [
                 "$msCompile"
             ],
@@ -13,6 +15,43 @@
                 "reveal": "silent"
             },
             "group": "build"
+        },
+        {
+            "label": "build-lib",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "/property:GeneratedFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "${workspaceFolder}/LegacyMockLib/LegacyMockLib.csproj"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "build-upgraded",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "/property:GeneratedFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "${workspaceFolder}/UpgradeLegacyServices/UpgradeLegacyServices.csproj"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "build",
+            "dependsOn": ["build-legacy", "build-upgraded"],
+            "problemMatcher": ["$msCompile"]
         }
     ]
 }
