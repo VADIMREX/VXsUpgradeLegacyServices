@@ -20,12 +20,14 @@ if (app.Environment.IsDevelopment())
     app.Use(async (context, next) => {
         Console.WriteLine($$"""
         Incoming request:
-        - Path: {{context.Request.Path}}
+        - Method Request?Query: {{context.Request.Method}} {{context.Request.Path}}?{{context.Request.QueryString}}
+        - Content-Type: {{context.Request.ContentType}}
         """);
 
         Endpoint? endpoint = context.GetEndpoint();
  
-        if (endpoint != null) Console.WriteLine("- No endpoint");
+        if (null == endpoint) 
+            Console.WriteLine("- No endpoint");
 
         await next();
     });
