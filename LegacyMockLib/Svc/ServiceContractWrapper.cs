@@ -3,6 +3,7 @@ namespace LegacyMockLib.Svc;
 using System.Reflection;
 using System.ServiceModel;
 using System.Text;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -19,6 +20,10 @@ public class ServiceContractWrapper
 
     public object Instance => instance ?? (instance = constructor.Invoke(new object[0]));
 
+    public string Namespace => serviceContract.Namespace ?? "http://tempuri.org";
+
+    public string Name => serviceContract.Name ?? type.Name;
+
     public ServiceContractWrapper(Type type, ServiceContractAttribute serviceContract, Type serviceContractType, IEndpointRouteBuilder app, string[] pathes)
     {
         this.type = type;
@@ -34,61 +39,91 @@ public class ServiceContractWrapper
 
         foreach (var mi in type.GetMethods())
         {
-            var baseMethod = serviceContractType == type ? mi : serviceContractType.GetMethod(mi.Name);
+            var baseMethod = serviceContractType == type ? 
+                                mi : 
+                                serviceContractType.GetMethod(
+                                    mi.Name, 
+                                    mi.GetParameters()
+                                      .Select(x=>x.ParameterType).ToArray()
+                                );
+
             if (null == baseMethod) continue;
             var attr = baseMethod.GetCustomAttribute<OperationContractAttribute>();
             if (null == attr) continue;
-            methods.Add($"{mi.Name}/{mi.Name}", new OperationContractWrapper(mi, attr, baseMethod, app, pathes));
+            var operation = new OperationContractWrapper(this, mi, attr, baseMethod, app, pathes);
+            methods.Add($"\"{Path.Combine(Namespace, Name, operation.Name)}\"", operation);
         }
     }
 
     async Task ProcessMethod(HttpContext context) {
-        if (!context.Request
-                    .ContentType
-                    ?.Split(";", StringSplitOptions.TrimEntries)
-                    .Contains("text/xml") ?? false) {
-            context.Response.StatusCode = 415;
-            return;
+        var mediaType = "";
+        var charset = "";
+        if (null != context.Request.ContentType)
+            foreach(var cType in context.Request
+                                        .ContentType
+                                        .Split(";", StringSplitOptions.TrimEntries & 
+                                                    StringSplitOptions.RemoveEmptyEntries)) {
+                var nameValue = cType.Split("=");
+                switch (nameValue[0]) {
+                    case "text/xml":
+                    case "application/json":
+                        mediaType = nameValue[0];
+                        break;
+                    case "charset":
+                        charset = nameValue[1];
+                        break;
+                }
+            }
+        switch(mediaType) {
+            case "text/xml":
+                await ProcessSoapMethod(context, charset);
+                return;
+            case "application/json":
+                await ProcessJsonMethod(context, charset);
+                return;
+            default:
+                context.Response.StatusCode = 415;
+                return;
         }
+    }
+
+    async Task ProcessSoapMethod(HttpContext context, string charset) {
         var soapAction = context.Request.Headers["SOAPAction"];
 
-        await context.Response.WriteAsync($$"""
-            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-              <s:Body>
-                <GetDataUsingDataContractResponse xmlns="http://tempuri.org/">
-                  <GetDataUsingDataContractResult xmlns:a="http://schemas.datacontract.org/2004/07/ResultType" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-                    
-                  </GetDataUsingDataContractResult>
-                </GetDataUsingDataContract>
-              </s:Body>
-            </s:Envelope>
-        """);
+        if (!methods.ContainsKey(soapAction)) {
+            // todo: Unknow method error
+            return;
+        }
+        var method = methods[soapAction];
+
+        var xmlRequest = await XDocument.LoadAsync(context.Request.Body, LoadOptions.None, new CancellationToken());
+        
+        var xmlResult = method.Invoke(xmlRequest);
+
+        context.Response.ContentType = "text/xml;charset=UTF-8";
+
+        await xmlResult.SaveAsync(context.Response.Body, SaveOptions.None, new CancellationToken());
+    }
+
+    async Task ProcessJsonMethod(HttpContext context, string charset) {
+
     }
 
     (string type, string content) DescriptionPage(string path) => ("text/html; charset=UTF-8", $$"""
         <html>
             <head>
-                <title>{{serviceContract.Name}} Service</title>
+                <title>{{type.Name}} Service</title>
             </head>
             <body>
-                <h1>{{serviceContract.Name}} Service</h1>
-                
+                <h1>{{type.Name}} Service</h1>
                 <hr>
-                
                 <span><a target="_blank" href="{{path}}?wsdl">{{path}}?wsdl</a></span>
-                
                 <br>
-
                 <span><a target="_blank" href="{{path}}?singleWsdl">{{path}}?singleWsdl</a></span>
-
                 <h2>Operation contracts</h2>
-
                 <ul>
-
                 {{methods.Aggregate(new StringBuilder(), (x, y) => x.AppendLine(y.Value.DesriptionItem(path)))}}
-
                 </ul>
-
             </body>
         </html>
     """);
@@ -117,5 +152,4 @@ public class ServiceContractWrapper
         
         await context.Response.WriteAsync(page);
     }
-
 }
