@@ -51,7 +51,7 @@ public class ServiceContractWrapper
             var attr = baseMethod.GetCustomAttribute<OperationContractAttribute>();
             if (null == attr) continue;
             var operation = new OperationContractWrapper(this, mi, attr, baseMethod, app, pathes);
-            methods.Add($"\"{Path.Combine(Namespace, Name, operation.Name)}\"", operation);
+            methods.Add($"\"{UrlUtils.Combine(Namespace, Name, operation.Name)}\"", operation);
         }
     }
 

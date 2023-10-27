@@ -10,6 +10,21 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
+public class UrlUtils {
+    public static string Combine(params string[] args) => 
+        null == args || 0 == args.Length ? 
+            "" : 
+        1 == args.Length ?
+            args[0].TrimEnd('/') :
+            args.Skip(1)
+                .Aggregate(
+                    new StringBuilder(args[0].TrimEnd('/')), 
+                    (s, e) => 
+                        s.Append('/')
+                         .Append(e.Trim('/')))
+                .ToString();
+}
+
 public class OperationContractWrapper
 {
     ServiceContractWrapper parent;
@@ -57,6 +72,7 @@ public class OperationContractWrapper
         if (null == obj) return new XAttribute(i + "nil", "true");
         var type = obj.GetType();
         if (type.IsValueType) return obj;
+        if (typeof(string) == type) return obj;
         var attr = type.GetCustomAttribute<DataContractAttribute>();
         return new XElement("dummy", 123);
     }
@@ -76,7 +92,7 @@ public class OperationContractWrapper
                     // , new XElement(
                     //     msAddressing + "Action", 
                     //     new XAttribute(soapenv + "mustUnderstand", "1"),
-                    //     Path.Combine(parent.Namespace, parent.Name, Name)
+                    //     UrlUtils.Combine(parent.Namespace, parent.Name, Name)
                     // )
                 ),
                 new XElement(soapenv + "Body",
@@ -111,7 +127,7 @@ public class OperationContractWrapper
                                     method: "POST",
                                     headers: {
                                         "Content-Type": "text/xml;charset=UTF-8",
-                                        "SOAPAction": '"{{Path.Combine(parent.Namespace, parent.Name, Name)}}"'
+                                        "SOAPAction": '"{{UrlUtils.Combine(parent.Namespace, parent.Name, Name)}}"'
                                     },
                                     body: value
                                 });
@@ -123,18 +139,40 @@ public class OperationContractWrapper
                             }
                         }
                     </script>
+                    <style>
+                        textarea {
+                            width: 100%;
+                            min-height: 300px;
+                        }
+                        button {
+                            border: 2px solid gray;
+                            border-radius: 4px;
+                            box-shadow: 0 1px 2px rgba(0,0,0,.1);
+                            color: #333;
+                            font-family: sans-serif;
+                            font-size: 14px;
+                            font-weight: 700;
+                            padding: 5px 20px;
+                        }
+                        button.send {
+                            background-color: steelblue;
+                            border-color: steelblue;
+                            color: #fff;
+                            width: 100%;
+                        }
+                    </style>
                 </head>
                 <body>
-                    <h1>Operation contract {{method.Name}}</h1>
+                    <h1>{{method.Name}} Operation</h1>
                     <hr>
                     <textarea id="requestBody" oninput="this.style.heigth='';this.style.height=this.scrollHeight + 'px'">
                     {{MakeSoapMessage(method.GetParameters()
-                                            .Select(x => (x, Activator.CreateInstance(x.ParameterType)))
+                                            .Select(x => (x, typeof(string) == x.ParameterType ? "" : Activator.CreateInstance(x.ParameterType)))
                                             .ToArray()
                                      )}}
                     </textarea>
                     <br>
-                    <button onclick="send()">Send</button>
+                    <button class="send" onclick="send()">Send</button>
                     <br>
                     <textarea id="responseBody">
                     </textarea>
