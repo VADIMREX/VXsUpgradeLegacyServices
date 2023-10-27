@@ -6,7 +6,10 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 
-namespace LegacyServices {
+using LegacyServices.Intefaces;
+using LegacyServices.Models;
+
+namespace LegacyServices.Svc {
     public class ServiceBase : IServiceBase
     {
         public string GetData(int value) {

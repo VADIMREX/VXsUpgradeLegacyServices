@@ -1,1 +1,1 @@
-<%@ ServiceHost Language="C#" Debug="true" Service="LegacyServices.ServiceImplicit" CodeBehind="..\..\ServiceImplicit.svc.cs" %>
+<%@ ServiceHost Language="C#" Debug="true" Service="LegacyServices.Svc.ServiceImplicit" CodeBehind="..\..\ServiceImplicit.svc.cs" %>

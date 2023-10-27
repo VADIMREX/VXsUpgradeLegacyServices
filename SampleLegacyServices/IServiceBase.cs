@@ -5,8 +5,9 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using LegacyServices.Models;
 
-namespace LegacyServices {
+namespace LegacyServices.Intefaces {
     [ServiceContract]
     public interface IServiceBase {
         [OperationContract]
@@ -15,7 +16,9 @@ namespace LegacyServices {
         [OperationContract]
         CompositeType GetDataUsingDataContract(CompositeType composite);
     }
+}
 
+namespace LegacyServices.Models {
     [DataContract]
     public class CompositeType {
         bool boolValue = true;

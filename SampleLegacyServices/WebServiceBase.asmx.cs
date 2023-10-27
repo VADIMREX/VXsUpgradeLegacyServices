@@ -4,8 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Services;
 
-namespace LegacyServices {
-    [WebService(Namespace = "http://tempuri.org")]
+namespace LegacyServices.Asmx {
+    [WebService]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     // [System.Web.Script.Services.ScriptService]

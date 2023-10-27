@@ -1,1 +1,1 @@
-<%@ WebService Language="C#" CodeBehind="WebServiceBase.asmx.cs" Class="LegacyServices.WebServiceBase" %>
+<%@ WebService Language="C#" CodeBehind="WebServiceBase.asmx.cs" Class="LegacyServices.Asmx.WebServiceBase" %>
