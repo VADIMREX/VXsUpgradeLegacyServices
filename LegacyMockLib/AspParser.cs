@@ -156,7 +156,9 @@ public class AspParser {
             var (className, _) = ParseAspFile(s);
 
             if (!fileClass.ContainsKey(className)) fileClass.Add(className, new List<string>());
-            fileClass[className].Add(fi.FullName.Replace(rootPath, ""));
+            var relativePath = fi.FullName.Replace(rootPath, "");
+            if ('/' != Path.DirectorySeparatorChar) relativePath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            fileClass[className].Add(relativePath);
         }
         foreach(var subdi in directory.GetDirectories())
             fileClass = ParseDirectory(rootPath, subdi, fileClass);
