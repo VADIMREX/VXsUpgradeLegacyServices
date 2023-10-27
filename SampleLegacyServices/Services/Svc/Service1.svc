@@ -1,1 +1,1 @@
-<%@ ServiceHost Language="C#" Debug="true" Service="LegacyServices.Svc.ServiceBase" CodeBehind="..\..\ServiceBase.svc.cs" %>
+<%@ ServiceHost Language="C#" Debug="true" Service="LegacyServices.Svc.BaseService" CodeBehind="..\..\BaseService.svc.cs" %>

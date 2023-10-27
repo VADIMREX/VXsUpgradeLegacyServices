@@ -12,31 +12,39 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\SampleLegacyServices\IServiceBase.cs" Link="IServiceBase.cs"/>
-    <Compile Include="..\SampleLegacyServices\IServiceImplicit.cs" Link="IServiceImplicit.cs"/>
-    <Compile Include="..\SampleLegacyServices\ServiceBase.svc.cs" Link="ServiceBase.svc.cs"/>
-    <Compile Include="..\SampleLegacyServices\ServiceImplicit.svc.cs" Link="ServiceImplicit.svc.cs"/>
-    <Content Include="..\SampleLegacyServices\ServiceBase.svc" Link="ServiceBase.svc">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\SampleLegacyServices\ServiceImplicit.svc" Link="ServiceImplicit.svc">
+    <!-- Models -->
+    <Compile Include="..\SampleLegacyServices\Models\BaseContract.cs" Link="Models\BaseContract.cs" />
+    <Compile Include="..\SampleLegacyServices\Models\CustomContract.cs" Link="Models\CustomContract.cs" />
+    <Compile Include="..\SampleLegacyServices\Models\CustomType.cs" Link="Models\CustomType.cs" />
+    <!-- SVC Services with empty attributes-->
+    <Compile Include="..\SampleLegacyServices\Interfaces\IBaseService.cs" Link="Interfaces\IBaseService.cs" />
+    <Compile Include="..\SampleLegacyServices\BaseService.svc.cs" Link="BaseService.svc.cs" />
+    <Content Include="..\SampleLegacyServices\BaseService.svc" Link="BaseService.svc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SampleLegacyServices\Services\Svc\Service1.svc" Link="Services\Svc\Service1.svc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <!-- SVC Services with customized attributes-->
+    <Compile Include="..\SampleLegacyServices\Interfaces\ICustomService.cs" Link="Interfaces\ICustomService.cs" />
+    <Compile Include="..\SampleLegacyServices\CustomService.svc.cs" Link="CustomService.svc.cs" />
+    <Content Include="..\SampleLegacyServices\CustomService.svc" Link="CustomService.svc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\SampleLegacyServices\Services\Svc\Service2.svc" Link="Services\Svc\Service2.svc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="..\SampleLegacyServices\WebServiceBase.asmx.cs" Link="WebServiceBase.asmx.cs"/>
-    <Compile Include="..\SampleLegacyServices\WebServiceImplicit.asmx.cs" Link="WebServiceImplicit.asmx.cs"/>
-    <Content Include="..\SampleLegacyServices\WebServiceBase.asmx" Link="WebServiceBase.asmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\SampleLegacyServices\WebServiceImplicit.asmx" Link="WebServiceImplicit.asmx">
+    <!-- ASMX Services with empty attributes-->
+    <Compile Include="..\SampleLegacyServices\BaseService.asmx.cs" Link="BaseService.asmx.cs" />
+    <Content Include="..\SampleLegacyServices\BaseService.asmx" Link="BaseService.asmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SampleLegacyServices\Services\Asmx\WebService1.asmx" Link="Services\Asmx\WebService1.asmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <!-- ASMX Services with customized attributes-->
+    <Compile Include="..\SampleLegacyServices\CustomService.asmx.cs" Link="CustomService.asmx.cs" />
+    <Content Include="..\SampleLegacyServices\CustomService.asmx" Link="CustomService.asmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SampleLegacyServices\Services\Asmx\WebService2.asmx" Link="Services\Asmx\WebService2.asmx">
@@ -46,6 +54,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LegacyMockLib\LegacyMockLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

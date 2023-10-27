@@ -1,1 +1,0 @@
-<%@ WebService Language="C#" CodeBehind="WebServiceImplicit.asmx.cs" Class="LegacyServices.Asmx.WebServiceImplicit" %>
