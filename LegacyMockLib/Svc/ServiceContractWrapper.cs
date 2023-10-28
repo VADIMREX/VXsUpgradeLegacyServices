@@ -102,7 +102,9 @@ public class ServiceContractWrapper
 
         context.Response.ContentType = "text/xml;charset=UTF-8";
 
-        await xmlResult.SaveAsync(context.Response.Body, SaveOptions.None, new CancellationToken());
+        var s = xmlResult.ToString();
+        
+        await context.Response.WriteAsync(s);
     }
 
     async Task ProcessJsonMethod(HttpContext context, string charset) {
