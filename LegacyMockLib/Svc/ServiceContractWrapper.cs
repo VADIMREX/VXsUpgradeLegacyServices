@@ -20,7 +20,9 @@ public class ServiceContractWrapper
 
     public object Instance => instance ?? (instance = constructor.Invoke(new object[0]));
 
-    public string Namespace => serviceContract.Namespace ?? "http://tempuri.org";
+    public string Namespace => serviceContract.Namespace ?? XmlNamespaces.org._tempuri;
+
+    public XNamespace XmlNs => Namespace;
 
     public string Name => serviceContract.Name ?? type.Name;
 

@@ -14,9 +14,8 @@ public static class LegacyAspExtension {
         var fileClasses = AspParser.ParseDirectory(aspFolder);
         foreach(var type in aspAssembly.GetTypes()) {
             if (type.IsInterface) continue;
-            var attributeInfo = type.GetCustomAttributeRecursevely<ServiceContractAttribute>();
-            if (null != attributeInfo) {
-                var (serviceContract, serviceContractType) = attributeInfo.Value;
+            var (serviceContract, serviceContractType) = type.GetCustomAttributeRecursevely<ServiceContractAttribute>();
+            if (null != serviceContract) {
                 new ServiceContractWrapper(type, serviceContract, serviceContractType, app, fileClasses.ContainsKey(type.FullName) ? fileClasses[type.FullName].ToArray() : new string[0]) ;
             }
             var webServices = type.GetCustomAttributesRecursevely<WebServiceAttribute>().ToArray();

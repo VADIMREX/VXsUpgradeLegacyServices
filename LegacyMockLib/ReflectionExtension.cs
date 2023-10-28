@@ -4,9 +4,10 @@ using System.Reflection;
 
 public static class ReflectionExtension
 {
-    public static (T, Type)? GetCustomAttributeRecursevely<T>(this Type type) where T : Attribute
+    public static (T? attribute, Type? targetType) GetCustomAttributeRecursevely<T>(this Type type) where T : Attribute
     {
-        if (typeof(object) == type) return null;
+        if (typeof(object) == type) return (null, null);
+        
         var attrs = type.GetCustomAttributes<T>(true).ToArray();
         if (1 == attrs.Length) return (attrs[0], type);
         if (1 < attrs.Length) throw new AmbiguousMatchException();
@@ -14,16 +15,16 @@ public static class ReflectionExtension
         if (null != type.BaseType)
         {
             var attr = type.BaseType.GetCustomAttributeRecursevely<T>();
-            if (null != attr) return attr;
+            if (null != attr.targetType) return attr;
         }
 
         foreach (var ii in type.GetInterfaces())
         {
             var attr = ii.GetCustomAttributeRecursevely<T>();
-            if (null != attr) return attr;
+            if (null != attr.targetType) return attr;
         }
 
-        return null;
+        return (null, null);
     }
 
     public static IEnumerable<(T, Type)> GetCustomAttributesRecursevely<T>(this Type type) where T : Attribute

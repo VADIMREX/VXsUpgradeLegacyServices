@@ -2,11 +2,13 @@ namespace LegacyMockLib.Svc;
 
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.DataContracts;
 using System.ServiceModel;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 
 using VXs.Xml;
@@ -33,6 +35,8 @@ public class OperationContractWrapper
     OperationContractAttribute operationContract;
     MethodInfo operationContractMethod;
 
+    XNamespace? ResultXmlns;
+
     public string Name => operationContract.Name ?? method.Name;
 
     public OperationContractWrapper(ServiceContractWrapper parent, MethodInfo method, OperationContractAttribute operationContract, MethodInfo operationContractMethod, IEndpointRouteBuilder app, string[] pathes)
@@ -42,6 +46,10 @@ public class OperationContractWrapper
         this.operationContract = operationContract;
         this.operationContractMethod = operationContractMethod;
 
+        var (resAttr, _) = method.ReturnType.GetCustomAttributeRecursevely<DataContractAttribute>();
+
+        ResultXmlns = XConvert.ValueNs(resAttr, method.ReturnType);
+
         foreach (var path in pathes)
         {
             app.MapGet($"{path}/{Name}", DescriptionPage);
@@ -50,17 +58,19 @@ public class OperationContractWrapper
 
     public XDocument Invoke(XDocument request)
     {
-        XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
-        XNamespace ns = parent.Namespace;
-        var args = new List<object>();
-        var xbody = request.Root.Element(soapenv + "Body");
-        var xargs = xbody.Element(ns + Name);
+        if (null == request.Root) throw new Exception("request malformed)");
+
+        var xbody = request.Root.Element(XmlNs.E + "Body");
+        if (null == xbody) throw new Exception($"request malformed ({XmlNs.E + "Body"} not found)");
+
+        var xargs = xbody.Element(parent.XmlNs + Name);
+        if (null == xargs) throw new Exception($"request malformed ({parent.XmlNs + Name} not found)");
+
+        var args = new List<object?>();
 
         foreach(var (pi, xa) in from pi in method.GetParameters()
-                                join xa in xargs.Elements()
-                                on ns + pi.Name equals xa.Name
-                                select (pi, xa)) {
-           
+                                let xa = xargs.Elements(parent.XmlNs + pi.Name).ToArray()
+                                select (pi, xa)) {         
             args.Add(XConvert.DeserializeObject(xa, pi.ParameterType));
         }
 
@@ -68,15 +78,12 @@ public class OperationContractWrapper
 
         return new XDocument(
             new XElement(
-                soapenv + "Envelope",
+                XmlNs.E + "Envelope",
                 new XElement(
-                    soapenv + "Body",
+                    XmlNs.E + "Body",
                     new XElement(
-                        ns + $"{Name}Response",
-                        new XElement(
-                            /* result type namespace + or "http://schemas.datacontract.org/2004/07/ResultType" */ $"{Name}Result",
-                            result
-                        )
+                        parent.XmlNs + $"{Name}Response",
+                        XConvert.SerializeObject((ResultXmlns ?? "") + $"{Name}Result", result)
                     )
                 )
             )
@@ -85,43 +92,24 @@ public class OperationContractWrapper
 
     public string DesriptionItem(string basePath) =>
         $$"""<li><a href="{{basePath}}/{{Name}}">{{Name}}</a></li>""";
-
-    object SerializeObject(object? obj) {
-        XNamespace i = "http://www.w3.org/2001/XMLSchema-instance";
-        if (null == obj) return new XAttribute(i + "nil", "true");
-        var type = obj.GetType();
-        if (type.IsValueType) return obj;
-        if (typeof(string) == type) return obj;
-        var attr = type.GetCustomAttribute<DataContractAttribute>();
-        return new XElement("dummy", 123);
-    }
     
     public string MakeSoapMessage((ParameterInfo parameterInfo, object? value)[] values)
     {
-        XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
-        XNamespace i = "http://www.w3.org/2001/XMLSchema-instance";
-        XNamespace unknown = "http://schemas.datacontract.org/2004/07/" + method.ReturnType.FullName.Remove(method.ReturnType.FullName.Length - method.ReturnType.Name.Length);
-        XNamespace service = parent.Namespace;
-        XNamespace msAddressing = "http://schemas.microsoft.com/ws/2005/05/addressing/none";
-
         var doc = new XDocument(
             new XElement(
-                soapenv + "Envelope",
-                new XElement(soapenv + "Header"
+                XmlNs.E + "Envelope",
+                new XElement(XmlNs.E + "Header"
                     // , new XElement(
-                    //     msAddressing + "Action", 
-                    //     new XAttribute(soapenv + "mustUnderstand", "1"),
+                    //     addressing.none + "Action", 
+                    //     new XAttribute(XmlNs.E + "mustUnderstand", "1"),
                     //     UrlUtils.Combine(parent.Namespace, parent.Name, Name)
                     // )
                 ),
-                new XElement(soapenv + "Body",
+                new XElement(XmlNs.E + "Body",
                     new XElement(
-                        service + Name,
+                        parent.XmlNs + Name,
                         values.Select(
-                            pv => new XElement(
-                                service + pv.parameterInfo.Name, 
-                                SerializeObject(pv.value)
-                            )
+                            pv => XConvert.SerializeObject(parent.XmlNs + pv.parameterInfo.Name, pv.value)
                         )
                     )
                 )
@@ -184,12 +172,11 @@ public class OperationContractWrapper
                 <body>
                     <h1>{{method.Name}} Operation</h1>
                     <hr>
-                    <textarea id="requestBody" oninput="this.style.heigth='';this.style.height=this.scrollHeight + 'px'">
-                    {{MakeSoapMessage(method.GetParameters()
-                                            .Select(x => (x, typeof(string) == x.ParameterType ? "" : Activator.CreateInstance(x.ParameterType)))
-                                            .ToArray()
-                                     )}}
-                    </textarea>
+                    <textarea id="requestBody" oninput="this.style.heigth='';this.style.height=this.scrollHeight + 'px'">{{
+                        MakeSoapMessage(method.GetParameters()
+                                              .Select(x => (x, typeof(string) == x.ParameterType ? "" : Activator.CreateInstance(x.ParameterType)))
+                                              .ToArray()
+                    )}}</textarea>
                     <br>
                     <button class="send" onclick="send()">Send</button>
                     <br>
