@@ -5,10 +5,11 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using System.Xml.Linq;
-using System.Xml.Schema;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+
+using VXs.Xml;
 
 public class UrlUtils {
     public static string Combine(params string[] args) => 
@@ -49,19 +50,37 @@ public class OperationContractWrapper
 
     public XDocument Invoke(XDocument request)
     {
+        XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
+        XNamespace ns = parent.Namespace;
+        var args = new List<object>();
+        var xbody = request.Root.Element(soapenv + "Body");
+        var xargs = xbody.Element(ns + Name);
 
+        foreach(var (pi, xa) in from pi in method.GetParameters()
+                                join xa in xargs.Elements()
+                                on ns + pi.Name equals xa.Name
+                                select (pi, xa)) {
+           
+            args.Add(XConvert.DeserializeObject(xa, pi.ParameterType));
+        }
 
-        return XDocument.Parse($$"""
-            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-              <s:Body>
-                <GetDataUsingDataContractResponse xmlns="">
-                  <GetDataUsingDataContractResult xmlns:a="http://schemas.datacontract.org/2004/07/ResultType" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-                    
-                  </GetDataUsingDataContractResult>
-                </GetDataUsingDataContractResponse>
-              </s:Body>
-            </s:Envelope>
-        """);
+        var result = method.Invoke(parent.Instance, args.ToArray());
+
+        return new XDocument(
+            new XElement(
+                soapenv + "Envelope",
+                new XElement(
+                    soapenv + "Body",
+                    new XElement(
+                        ns + $"{Name}Response",
+                        new XElement(
+                            /* result type namespace + or "http://schemas.datacontract.org/2004/07/ResultType" */ $"{Name}Result",
+                            result
+                        )
+                    )
+                )
+            )
+        );
     }
 
     public string DesriptionItem(string basePath) =>
