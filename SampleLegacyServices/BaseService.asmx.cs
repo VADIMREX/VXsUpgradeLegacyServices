@@ -21,7 +21,7 @@ namespace LegacyServices.Asmx {
         [WebMethod]
         public BaseContract GetBaseContract(BaseContract data) {
             if (null == data) return new BaseContract();
-            if (data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
+            if (null != data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
             data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
                                               .AppendLine(" - ")
                                               .Append(data.HidenDataTwo)
@@ -32,7 +32,7 @@ namespace LegacyServices.Asmx {
                                               .AppendLine(" - ")
                                               .Append(null == data.CustomData ? "-" : "+")
                                               .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, 20) ?? "Х")
+                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
                                               .ToString();
             data.HidenDataOne = data.Message;
             data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
@@ -45,7 +45,7 @@ namespace LegacyServices.Asmx {
         [WebMethod]
         public CustomContract GetCustomContract(CustomContract data) {
             if (null == data) return new CustomContract();
-            if (data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
+            if (null != data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
             data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
                                               .AppendLine(" - ")
                                               .Append(data.HidenDataTwo)
@@ -56,7 +56,7 @@ namespace LegacyServices.Asmx {
                                               .AppendLine(" - ")
                                               .Append(null == data.CustomData ? "-" : "+")
                                               .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, 20) ?? "Х")
+                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
                                               .ToString();
             data.HidenDataOne = data.Message;
             data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
@@ -69,7 +69,7 @@ namespace LegacyServices.Asmx {
         [WebMethod]
         public CustomType GetCustomData(CustomType data) {
             if (null == data) return new CustomType();
-            if (data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
+            if (null != data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
             data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
                                               .AppendLine(" - ")
                                               .Append(data.HidenDataTwo)
@@ -80,7 +80,7 @@ namespace LegacyServices.Asmx {
                                               .AppendLine(" - ")
                                               .Append(null == data.CustomData ? "-" : "+")
                                               .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, 20) ?? "Х")
+                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
                                               .ToString();
             data.HidenDataOne = data.Message;
             data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);

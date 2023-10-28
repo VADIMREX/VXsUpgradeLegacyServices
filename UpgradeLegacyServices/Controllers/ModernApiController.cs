@@ -33,7 +33,7 @@ public class ModernApiController : ControllerBase {
     [HttpPost("get-base-contract", Name = "Post base contract")]
     public BaseContract GetContract([FromBody]BaseContract data) {
             if (null == data) return new BaseContract();
-            if (data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
+            if (null == data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
             data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
                                               .AppendLine(" - ")
                                               .Append(data.HidenDataTwo)
@@ -44,7 +44,7 @@ public class ModernApiController : ControllerBase {
                                               .AppendLine(" - ")
                                               .Append(null == data.CustomData ? "-" : "+")
                                               .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, 20) ?? "Х")
+                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
                                               .ToString();
             data.HidenDataOne = data.Message;
             data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
@@ -57,7 +57,7 @@ public class ModernApiController : ControllerBase {
         [HttpPost("get-custom-contract", Name = "Post custom contract")]
         public CustomContract GetContract(CustomContract data) {
             if (null == data) return new CustomContract();
-            if (data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
+            if (null == data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
             data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
                                               .AppendLine(" - ")
                                               .Append(data.HidenDataTwo)
@@ -68,7 +68,7 @@ public class ModernApiController : ControllerBase {
                                               .AppendLine(" - ")
                                               .Append(null == data.CustomData ? "-" : "+")
                                               .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, 20) ?? "Х")
+                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
                                               .ToString();
             data.HidenDataOne = data.Message;
             data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
@@ -81,7 +81,7 @@ public class ModernApiController : ControllerBase {
         [HttpPost("get-custom-data", Name = "Post custom data")]
         public CustomType GetData(CustomType data) {
             if (null == data) return new CustomType();
-            if (data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
+            if (null == data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
             data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
                                               .AppendLine(" - ")
                                               .Append(data.HidenDataTwo)
@@ -92,7 +92,7 @@ public class ModernApiController : ControllerBase {
                                               .AppendLine(" - ")
                                               .Append(null == data.CustomData ? "-" : "+")
                                               .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, 20) ?? "Х")
+                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
                                               .ToString();
             data.HidenDataOne = data.Message;
             data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
