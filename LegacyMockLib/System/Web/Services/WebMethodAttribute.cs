@@ -4,9 +4,9 @@ namespace System.Web.Services;
 public sealed class WebMethodAttribute : Attribute {
     public bool BufferResponse { get; set; }
     public int CacheDuration { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public bool EnableSession { get; set; }
-    public string MessageName { get; set; }
+    public string? MessageName { get; set; }
     public EnterpriseServices.TransactionOption TransactionOption { get; set; }
     public WebMethodAttribute(){}
     public WebMethodAttribute (bool enableSession) => EnableSession = enableSession;

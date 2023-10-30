@@ -92,11 +92,15 @@ public class ServiceContractWrapper
     async Task ProcessSoapMethod(HttpContext context, string charset) {
         var soapAction = context.Request.Headers["SOAPAction"];
 
-        if (!methods.ContainsKey(soapAction)) {
+        if (0 == soapAction.Count) {
+            return;
+        }
+
+        if (!methods.ContainsKey(soapAction!)) {
             // todo: Unknow method error
             return;
         }
-        var method = methods[soapAction];
+        var method = methods[soapAction!];
 
         var xmlRequest = await XDocument.LoadAsync(context.Request.Body, LoadOptions.None, new CancellationToken());
         
@@ -110,7 +114,7 @@ public class ServiceContractWrapper
     }
 
     async Task ProcessJsonMethod(HttpContext context, string charset) {
-
+        await context.Response.WriteAsync("not implemented");
     }
 
     (string type, string content) DescriptionPage(string path) => ("text/html; charset=UTF-8", $$"""

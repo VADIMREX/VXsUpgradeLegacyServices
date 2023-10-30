@@ -48,7 +48,7 @@ namespace VXs.Xml
                 return DeserializeObject(objs[0], type);
             }
 
-            var elemType = type.GetElementType();
+            var elemType = type.GetElementType()!;
             var arr = Array.CreateInstance(elemType, objs.Length);
 
             for(var i = 0; i < objs.Length; i++)

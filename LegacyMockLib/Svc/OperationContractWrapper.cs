@@ -69,7 +69,8 @@ public class OperationContractWrapper
         var args = new List<object?>();
 
         foreach(var (pi, xa) in from pi in method.GetParameters()
-                                let xa = xargs.Elements(parent.XmlNs + pi.Name).ToArray()
+
+                                let xa = xargs.Elements(parent.XmlNs + pi.Name!).ToArray()
                                 select (pi, xa)) {         
             args.Add(XConvert.DeserializeObject(xa, pi.ParameterType));
         }
@@ -109,7 +110,7 @@ public class OperationContractWrapper
                     new XElement(
                         parent.XmlNs + Name,
                         values.Select(
-                            pv => XConvert.SerializeObject(parent.XmlNs + pv.parameterInfo.Name, pv.value)
+                            pv => XConvert.SerializeObject(parent.XmlNs + pv.parameterInfo.Name!, pv.value)
                         )
                     )
                 )

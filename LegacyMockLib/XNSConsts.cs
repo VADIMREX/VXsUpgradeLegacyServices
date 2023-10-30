@@ -18,7 +18,7 @@ namespace LegacyMockLib
 
     internal static class XmlNamespaces
     {
-        internal static class org
+        internal static class @org
         {
             internal const string _tempuri = "http://tempuri.org";
             internal static readonly XNamespace tempuri = _tempuri;
@@ -28,9 +28,9 @@ namespace LegacyMockLib
                 internal const string _wsdl = "http://schemas.xmlsoap.org/wsdl";
             }
 
-            internal static class xmlsoap
+            internal static class @xmlsoap
             {
-                public static class soap
+                public static class @soap
                 {
                     internal const string _envelope = "http://schemas.xmlsoap.org/soap/envelope/";
                     internal static readonly XNamespace envelope = _envelope;
@@ -49,7 +49,7 @@ namespace LegacyMockLib
                 }
             }
 
-            internal static class datacontract
+            internal static class @datacontract
             {
                 internal static class _2004
                 {
@@ -61,13 +61,13 @@ namespace LegacyMockLib
                 }
             }
         }
-        internal static class com
+        internal static class @com
         {
-            internal static class microsoft {
-                internal static class ws {
+            internal static class @microsoft {
+                internal static class @ws {
                     internal static class _2005 {
                         internal static class _05 {
-                            internal static class addressing {
+                            internal static class @addressing {
                                 internal const string _none = "http://schemas.microsoft.com/ws/2005/05/addressing/none";
                                 internal static readonly XNamespace none = _none;
                             }
