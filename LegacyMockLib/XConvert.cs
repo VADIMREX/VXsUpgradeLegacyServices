@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.DataContracts;
@@ -46,6 +47,12 @@ namespace VXs.Xml
 
                 // what we gonna do?
                 return DeserializeObject(objs[0], type);
+            }
+
+            if (typeof(byte[]) == type) {
+                if (0 == objs.Length) throw new NotImplementedException("binary without any element?");
+                if ("true" == objs[0].Attribute(XmlNs.I + "nil")?.Value) return null;
+                return Convert.FromBase64String(objs[0].Value);
             }
 
             var elemType = type.GetElementType()!;
@@ -107,6 +114,9 @@ namespace VXs.Xml
             if (type.IsValueType) return new XElement(name, obj);
             // strings
             if (typeof(string) == type) return new XElement(name, obj);
+            // byte[]
+            if (typeof(byte[]) == type) return new XElement(name, Convert.ToBase64String((byte[])obj));
+
             
             List<object> result = new ();
             // arrays
