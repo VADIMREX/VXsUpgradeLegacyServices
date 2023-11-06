@@ -74,6 +74,7 @@
     <Compile Include="Models\BaseContract.cs" />
     <Compile Include="Models\CustomContract.cs" />
     <Compile Include="Models\CustomType.cs" />
+    <Compile Include="ServiceLogic.cs" />
     <Compile Include="BaseService.svc.cs">
       <DependentUpon>BaseService.svc</DependentUpon>
       <DependentUpon>Services\Svc\Service1.svc</DependentUpon>

@@ -17,6 +17,8 @@
     <Compile Include="..\SampleLegacyServices\Models\BaseContract.cs" Link="Models\BaseContract.cs" />
     <Compile Include="..\SampleLegacyServices\Models\CustomContract.cs" Link="Models\CustomContract.cs" />
     <Compile Include="..\SampleLegacyServices\Models\CustomType.cs" Link="Models\CustomType.cs" />
+    <!-- Base logic for all services -->
+    <Compile Include="..\SampleLegacyServices\ServiceLogic.cs" Link="ServiceLogic.cs" />
     <!-- SVC Services with empty attributes-->
     <Compile Include="..\SampleLegacyServices\Interfaces\IBaseService.cs" Link="Interfaces\IBaseService.cs" />
     <Compile Include="..\SampleLegacyServices\BaseService.svc.cs" Link="BaseService.svc.cs" />

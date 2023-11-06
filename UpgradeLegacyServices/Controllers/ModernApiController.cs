@@ -1,4 +1,5 @@
 using System.Text;
+using LegacyServices;
 using LegacyServices.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,8 @@ public record ListItem(int no, string name);
 
 [ApiController]
 [Route("[controller]")]
-public class ModernApiController : ControllerBase {
+public class ModernApiController : ControllerBase
+{
     private readonly ILogger<ModernApiController> _logger;
 
     public ModernApiController(ILogger<ModernApiController> logger)
@@ -17,9 +19,10 @@ public class ModernApiController : ControllerBase {
     }
 
     [HttpGet("sample", Name = "Sample Get")]
-    public IEnumerable<ListItem> Get() {
+    public IEnumerable<ListItem> Get()
+    {
         _logger.LogInformation("Sample Get start");
-        for(int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
             yield return new ListItem(i + 1, DateTime.Now.AddMonths(i).ToString("MMMM"));
         _logger.LogInformation("Sample Get end");
     }
@@ -31,74 +34,20 @@ public class ModernApiController : ControllerBase {
     public string GetData(int value, [FromBody] string suffix) => $"You entered: {value}-{suffix}";
 
     [HttpPost("get-base-contract", Name = "Post base contract")]
-    public BaseContract GetContract([FromBody]BaseContract data) {
-            if (null == data) return new BaseContract();
-            if (null == data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
-            data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
-                                              .AppendLine(" - ")
-                                              .Append(data.HidenDataTwo)
-                                              .AppendLine(" - ")
-                                              .Append(null == data.SubContractOne ? "(T_T)" : "(￣﹃￣)")
-                                              .AppendLine(" - ")
-                                              .Append(null == data.SubContractTwo ? "😑" : "😌")
-                                              .AppendLine(" - ")
-                                              .Append(null == data.CustomData ? "-" : "+")
-                                              .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
-                                              .ToString();
-            data.HidenDataOne = data.Message;
-            data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
-            if (null == data.SubContractOne) data.SubContractOne = new BaseContract();
-            if (null == data.SubContractTwo) data.SubContractTwo = new CustomContract();
-            if (null == data.CustomData) data.CustomData = new CustomType();
-            return data;
-        }
+    public BaseContract GetContract([FromBody] BaseContract data)
+    {
+        return ServiceLogic.DoSomething(data);
+    }
 
-        [HttpPost("get-custom-contract", Name = "Post custom contract")]
-        public CustomContract GetContract(CustomContract data) {
-            if (null == data) return new CustomContract();
-            if (null == data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
-            data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
-                                              .AppendLine(" - ")
-                                              .Append(data.HidenDataTwo)
-                                              .AppendLine(" - ")
-                                              .Append(null == data.SubContractOne ? "(T_T)" : "(￣﹃￣)")
-                                              .AppendLine(" - ")
-                                              .Append(null == data.SubContractTwo ? "😑" : "😌")
-                                              .AppendLine(" - ")
-                                              .Append(null == data.CustomData ? "-" : "+")
-                                              .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
-                                              .ToString();
-            data.HidenDataOne = data.Message;
-            data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
-            if (null == data.SubContractOne) data.SubContractOne = new BaseContract();
-            if (null == data.SubContractTwo) data.SubContractTwo = new CustomContract();
-            if (null == data.CustomData) data.CustomData = new CustomType();
-            return data;
-        }
+    [HttpPost("get-custom-contract", Name = "Post custom contract")]
+    public CustomContract GetContract(CustomContract data)
+    {
+        return ServiceLogic.DoSomething(data);
+    }
 
-        [HttpPost("get-custom-data", Name = "Post custom data")]
-        public CustomType GetData(CustomType data) {
-            if (null == data) return new CustomType();
-            if (null == data.NotProperty && data.NotProperty.Length > 0) data.HidenDataTwo = data.NotProperty[0];
-            data.Message = new StringBuilder().Append(data.IsTruth ? "not fake" : "fake")
-                                              .AppendLine(" - ")
-                                              .Append(data.HidenDataTwo)
-                                              .AppendLine(" - ")
-                                              .Append(null == data.SubContractOne ? "(T_T)" : "(￣﹃￣)")
-                                              .AppendLine(" - ")
-                                              .Append(null == data.SubContractTwo ? "😑" : "😌")
-                                              .AppendLine(" - ")
-                                              .Append(null == data.CustomData ? "-" : "+")
-                                              .AppendLine(" - ")
-                                              .Append(data.Message?.Substring(0, data.Message.Length < 20 ? data.Message.Length : 20) ?? "Х")
-                                              .ToString();
-            data.HidenDataOne = data.Message;
-            data.BinaryData = Encoding.UTF8.GetBytes(data.HidenDataOne);
-            if (null == data.SubContractOne) data.SubContractOne = new BaseContract();
-            if (null == data.SubContractTwo) data.SubContractTwo = new CustomContract();
-            if (null == data.CustomData) data.CustomData = new CustomType();
-            return data;
-        }
+    [HttpPost("get-custom-data", Name = "Post custom data")]
+    public CustomType GetData(CustomType data)
+    {
+        return ServiceLogic.DoSomething(data);
+    }
 }
