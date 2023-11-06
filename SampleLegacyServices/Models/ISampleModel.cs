@@ -2,15 +2,12 @@ using System;
 using System.Collections.Generic;
 
 namespace LegacyServices.Models {
-    public class ISampleModel {
+    public interface ISampleModel {
         /// <summary> implicit boolean property </summary>
         bool IsTruth { get; set; }
 
         /// <summary> explicit string property </summary>
         string Message { get; set; }
-
-        /// <summary> decimal array field </summary>
-        decimal[] NotProperty;
 
         /// <summary> contract with type like self </summary>
         BaseContract SubContractOne { get; set; } 
@@ -40,10 +37,7 @@ namespace LegacyServices.Models {
 
         Dictionary<string, CustomType> KeyValues3 { get; set; }
 
-        List<string> ListOfSomething { get; set; }
-
-        /// <summary> not hidden field </summary>
-        string HidenDataOne;       
+        List<string> ListOfSomething { get; set; }  
 
         /// <summary> not hidden propery </summary>
         decimal HidenDataTwo { get; set; }
