@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace LegacyServices.Models {
     public class CustomType : ISampleModel {
         /// <summary> hiden field for property <see cref="IsTruth"/></summary>
