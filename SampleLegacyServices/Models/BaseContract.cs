@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace LegacyServices.Models {
     /// <summary> Model with empty DataContract/DataMember attributes </summary>
     [DataContract]
-    public class BaseContract {
+    public class BaseContract : ISampleModel {
         /// <summary> hiden field for property <see cref="IsTruth"/></summary>
         bool hidenDataZero_isTruth = true;
 
@@ -36,7 +36,35 @@ namespace LegacyServices.Models {
 
         /// <summary> custom type </summary>
         [DataMember]
-        public CustomType CustomData { get; set; } 
+        public CustomType CustomData { get; set; }
+
+        
+        [DataMember]
+        public DateTime SomeDate { get; set; }
+
+        [DataMember]
+        public int[] IntArray { get; set; }
+
+        [DataMember]
+        public decimal[] DecimalArray { get; set; }
+
+        [DataMember]
+        public double[] DoubleArray { get; set; }
+
+        [DataMember]
+        public Dictionary<string, string> StringPairs { get; set; }
+
+        [DataMember]
+        public Dictionary<string, BaseContract> KeyValues1 { get; set; }
+
+        [DataMember]
+        public Dictionary<string, CustomContract> KeyValues2 { get; set; }
+
+        [DataMember]
+        public Dictionary<string, CustomType> KeyValues3 { get; set; }
+
+        [DataMember]
+        public List<string> ListOfSomething { get; set; }
 
         /// <summary> public but not serializable field </summary>
         public string HidenDataOne;       

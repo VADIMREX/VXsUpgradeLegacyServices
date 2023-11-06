@@ -1,5 +1,5 @@
 namespace LegacyServices.Models {
-    public class CustomType {
+    public class CustomType : ISampleModel {
         /// <summary> hiden field for property <see cref="IsTruth"/></summary>
         bool hidenDataZero_isTruth = true;
 
@@ -26,6 +26,24 @@ namespace LegacyServices.Models {
 
         /// <summary> custom type </summary>
         public CustomType CustomData { get; set; } 
+
+        public DateTime SomeDate { get; set; }
+
+        public int[] IntArray { get; set; }
+
+        public decimal[] DecimalArray { get; set; }
+
+        public double[] DoubleArray { get; set; }
+
+        public Dictionary<string, string> StringPairs { get; set; }
+
+        public Dictionary<string, BaseContract> KeyValues1 { get; set; }
+
+        public Dictionary<string, CustomContract> KeyValues2 { get; set; }
+
+        public Dictionary<string, CustomType> KeyValues3 { get; set; }
+
+        public List<string> ListOfSomething { get; set; }
 
         /// <summary> not hidden field </summary>
         public string HidenDataOne;       

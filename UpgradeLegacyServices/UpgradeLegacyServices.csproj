@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <!-- Models -->
+    <Compile Include="..\SampleLegacyServices\Models\ISampleModel.cs" Link="Models\ISampleModel.cs" />
     <Compile Include="..\SampleLegacyServices\Models\BaseContract.cs" Link="Models\BaseContract.cs" />
     <Compile Include="..\SampleLegacyServices\Models\CustomContract.cs" Link="Models\CustomContract.cs" />
     <Compile Include="..\SampleLegacyServices\Models\CustomType.cs" Link="Models\CustomType.cs" />

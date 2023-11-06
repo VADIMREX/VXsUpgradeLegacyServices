@@ -70,6 +70,7 @@
     <Content Include="Services\Asmx\WebService2.asmx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ISampleModel.cs" />
     <Compile Include="Models\BaseContract.cs" />
     <Compile Include="Models\CustomContract.cs" />
     <Compile Include="Models\CustomType.cs" />
