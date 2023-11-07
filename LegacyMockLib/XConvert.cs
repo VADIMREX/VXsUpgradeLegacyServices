@@ -106,7 +106,7 @@ namespace VXs.Xml
             return result;
         }
 
-        public static object SerializeObject(XName name, object? obj) {
+        public static XElement SerializeObject(XName name, object? obj) {
             // null
             if (null == obj) return new XElement(name, new XAttribute(XmlNs.I + "nil", "true"));
             var type = obj.GetType();
@@ -118,12 +118,13 @@ namespace VXs.Xml
             if (typeof(byte[]) == type) return new XElement(name, Convert.ToBase64String((byte[])obj));
 
             
-            List<object> result = new ();
             // arrays
             if (type.IsArray) {
-                foreach(var a in (Array)obj)
-                    result.Add(SerializeObject(name, a));
-                return result.ToArray();
+                var arr = (Array)obj;
+                var result = new object[arr.Length];
+                for(int i = 0 ; i < arr.Length; i++)
+                    result[i] = SerializeObject(name, arr.GetValue(i));
+                return new XElement(name, result);
             }
 
             // objects
@@ -133,13 +134,16 @@ namespace VXs.Xml
             var targetList = GetMembers(type);
             #endregion
 
-            foreach (var (member, dataMember) in targetList)
             {
-                var value = member.GetValue(obj);
-                result.Add(SerializeObject((valueNs ?? "") + (dataMember?.Name ?? member.Name), value));
-            }
+                var result = new List<object>();
+                foreach (var (member, dataMember) in targetList)
+                {
+                    var value = member.GetValue(obj);
+                    result.Add(SerializeObject((valueNs ?? "") + (dataMember?.Name ?? member.Name), value));
+                }
 
-            return new XElement(name, result.ToArray());
+                return new XElement(name, result.ToArray());
+            }
         }
     }
 

@@ -14,6 +14,8 @@ namespace LegacyMockLib
 
         /// <summary> Generate DataContract XML Namespace - xmlns:a="http://schemas.datacontract.org/2004/07/:ns" </summary>
         public static XNamespace MakeA(string ns) => XmlNamespaces.org.datacontract._2004._07.Make(ns);
+
+        public static readonly XNamespace A = XmlNamespaces.com.microsoft._2003._10.Serialization.Arrays;
     }
 
     internal static class XmlNamespaces
@@ -71,6 +73,14 @@ namespace LegacyMockLib
                                 internal const string _none = "http://schemas.microsoft.com/ws/2005/05/addressing/none";
                                 internal static readonly XNamespace none = _none;
                             }
+                        }
+                    }
+               }
+               internal static class _2003 {
+                    internal static class _10 {
+                        internal static class Serialization {
+                            internal const string _Arrays = "http://schemas.microsoft.com/2003/10/Serialization/Arrays";
+                            internal static readonly XNamespace Arrays = _Arrays;
                         }
                     }
                }

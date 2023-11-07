@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace LegacyServices.Models {
     /// <summary> </summary>
-    [DataContract(Name = "custom-contract", Namespace = "http://legacy-services/models")]
+    [DataContract(Name = "custom-contract", Namespace = "http://legacy-services/models", IsReference = true)]
     public class CustomContract : ISampleModel {
         /// <summary> hiden field for property <see cref="IsTruth"/></summary>
         bool hidenDataZero_isTruth = true;
