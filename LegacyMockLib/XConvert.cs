@@ -46,28 +46,36 @@ namespace VXs.Xml
         {
             if (0 == objs.Length) return null;
 
-            if (!type.IsArray)
-            {
-                if (1 == objs.Length) return DeserializeObject(objs[0], type);
+            if (type.IsArray) {
+                if (typeof(byte[]) == type)
+                {
+                    if (0 == objs.Length) throw new NotImplementedException("binary without any element?");
+                    if ("true" == objs[0].Attribute(XmlNs.I + "nil")?.Value) return null;
+                    return Convert.FromBase64String(objs[0].Value);
+                }
 
-                // what we gonna do?
-                return DeserializeObject(objs[0], type);
+                var elemType = type.GetElementType()!;
+                var arr = Array.CreateInstance(elemType, objs.Length);
+
+                for (var i = 0; i < objs.Length; i++)
+                    arr.SetValue(DeserializeObject(objs[0], elemType), i);
+
+                return arr;
+            }
+            else if (type.IsGenericType) {
+                var genericType = type.GetGenericTypeDefinition();
+                if (typeof(List<>) == genericType) {
+                    return null;
+                }
+                else if (typeof(Dictionary<,>) == genericType) {
+                    return null;
+                }
             }
 
-            if (typeof(byte[]) == type)
-            {
-                if (0 == objs.Length) throw new NotImplementedException("binary without any element?");
-                if ("true" == objs[0].Attribute(XmlNs.I + "nil")?.Value) return null;
-                return Convert.FromBase64String(objs[0].Value);
-            }
+            if (1 == objs.Length) return DeserializeObject(objs[0], type);
 
-            var elemType = type.GetElementType()!;
-            var arr = Array.CreateInstance(elemType, objs.Length);
-
-            for (var i = 0; i < objs.Length; i++)
-                arr.SetValue(DeserializeObject(objs[0], elemType), i);
-
-            return arr;
+            // what we gonna do?
+            return DeserializeObject(objs[0], type);
         }
 
         public static object? DeserializeObject(XElement obj, Type type)
