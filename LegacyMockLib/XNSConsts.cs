@@ -15,6 +15,7 @@ namespace LegacyMockLib
         /// <summary> Generate DataContract XML Namespace - xmlns:a="http://schemas.datacontract.org/2004/07/:ns" </summary>
         public static XNamespace MakeA(string ns) => XmlNamespaces.org.datacontract._2004._07.Make(ns);
 
+        /// <summary> xmlns:a="http://schemas.datacontract.org/2004/07/" </summary>
         public static readonly XNamespace A = XmlNamespaces.com.microsoft._2003._10.Serialization.Arrays;
     }
 

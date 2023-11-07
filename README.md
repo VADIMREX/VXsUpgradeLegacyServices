@@ -21,11 +21,11 @@ Library for compatibility with legacy WCF/ASMX services.
   - [x] Deserialize primiteves, strings and classes with members of them
   - [x] Serialize byte arrays
   - [x] Deserialize byte arrays
-  - [ ] Serialize DateTime
+  - [x] Serialize DateTime
   - [ ] Deserialize DateTime
-  - [ ] Serialize Arrays and Lists
+  - [x] Serialize Arrays and Lists
   - [ ] Deserialize Arrays and Lists
-  - [ ] Serialize Dictionaries
+  - [x] Serialize Dictionaries
   - [ ] Deserialize Dictionaries
   - [ ] JSON compatibility
 - [ ] Asmx

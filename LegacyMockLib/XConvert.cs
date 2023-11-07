@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.DataContracts;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using LegacyMockLib;
 using LegacyMockLib.Svc;
@@ -21,7 +23,8 @@ namespace VXs.Xml
                 XmlNs.MakeA(valueType.FullName.Remove(valueType.FullName.Length - valueType.Name.Length)) :
             dataContract.Namespace;
 
-        public static List<(MemberInfo member, DataMemberAttribute? dataMember)> GetMembers(Type type) {
+        public static List<(MemberInfo member, DataMemberAttribute? dataMember)> GetMembers(Type type)
+        {
             List<(MemberInfo, DataMemberAttribute?)> dataMembers = new();
             List<(MemberInfo, DataMemberAttribute?)> members = new();
 
@@ -39,17 +42,20 @@ namespace VXs.Xml
 
         public static T DeserializeObject<T>(XElement[] objs, T sample) => (T)DeserializeObject(objs, typeof(T))!;
 
-        public static object? DeserializeObject(XElement[] objs, Type type) {
+        public static object? DeserializeObject(XElement[] objs, Type type)
+        {
             if (0 == objs.Length) return null;
 
-            if (!type.IsArray) {
+            if (!type.IsArray)
+            {
                 if (1 == objs.Length) return DeserializeObject(objs[0], type);
 
                 // what we gonna do?
                 return DeserializeObject(objs[0], type);
             }
 
-            if (typeof(byte[]) == type) {
+            if (typeof(byte[]) == type)
+            {
                 if (0 == objs.Length) throw new NotImplementedException("binary without any element?");
                 if ("true" == objs[0].Attribute(XmlNs.I + "nil")?.Value) return null;
                 return Convert.FromBase64String(objs[0].Value);
@@ -58,7 +64,7 @@ namespace VXs.Xml
             var elemType = type.GetElementType()!;
             var arr = Array.CreateInstance(elemType, objs.Length);
 
-            for(var i = 0; i < objs.Length; i++)
+            for (var i = 0; i < objs.Length; i++)
                 arr.SetValue(DeserializeObject(objs[0], elemType), i);
 
             return arr;
@@ -80,7 +86,7 @@ namespace VXs.Xml
             }
 
             #region DataContract and DataMember attributes specified logic. 
-            #warning Todo to extract
+#warning Todo to extract
             var valueNs = ValueNs(type);
             var targetList = GetMembers(type);
             #endregion
@@ -97,7 +103,8 @@ namespace VXs.Xml
             foreach (var (member, dataMember) in targetList)
             {
                 var elem = obj.Elements((valueNs ?? "") + (dataMember?.Name ?? member.Name)).ToArray();
-                if (0 == elem.Length) {
+                if (0 == elem.Length)
+                {
                     continue;
                 }
                 var value = DeserializeObject(elem, member.MemberInstanceType());
@@ -106,7 +113,30 @@ namespace VXs.Xml
             return result;
         }
 
-        public static XElement SerializeObject(XName name, object? obj) {
+        public static string ReservedTypeName(Type type)
+        {
+            if (typeof(bool) == type) return "bool";
+            if (typeof(char) == type) return "char";
+            if (typeof(string) == type) return "string";
+
+            if (typeof(float) == type) return "float";
+            if (typeof(double) == type) return "double";
+            if (typeof(decimal) == type) return "decimal";
+
+            if (typeof(byte) == type) return "byte";
+            if (typeof(sbyte) == type) return "sbyte";
+            if (typeof(short) == type) return "short";
+            if (typeof(ushort) == type) return "ushort";
+            if (typeof(int) == type) return "int";
+            if (typeof(uint) == type) return "uint";
+            if (typeof(long) == type) return "long";
+            if (typeof(ulong) == type) return "ulong";
+
+            return type.Name;
+        }
+
+        public static XElement SerializeObject(XName name, object? obj)
+        {
             // null
             if (null == obj) return new XElement(name, new XAttribute(XmlNs.I + "nil", "true"));
             var type = obj.GetType();
@@ -116,25 +146,71 @@ namespace VXs.Xml
             if (typeof(string) == type) return new XElement(name, obj);
             // byte[]
             if (typeof(byte[]) == type) return new XElement(name, Convert.ToBase64String((byte[])obj));
+            // DateTime
+            if (typeof(DateTime) == type) return new XElement(name, ((DateTime)obj).ToString("o"));
 
-            
             // arrays
-            if (type.IsArray) {
+            if (type.IsArray)
+            {
+                var baseType = type.GetElementType()!;
+                var (dataContract, _) = baseType.GetCustomAttributeRecursevely<DataContractAttribute>();
+
                 var arr = (Array)obj;
                 var result = new object[arr.Length];
-                for(int i = 0 ; i < arr.Length; i++)
-                    result[i] = SerializeObject(name, arr.GetValue(i));
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    var value = arr.GetValue(i);
+                    result[i] = SerializeObject(XmlNs.A + (dataContract?.Name ?? ReservedTypeName(baseType)), value);
+                }
                 return new XElement(name, result);
             }
+            else if (type.IsGenericType)
+            {
+                // List<>
+                var genericType = type.GetGenericTypeDefinition();
+                if (typeof(List<>) == genericType)
+                {
+                    var baseType = type.GenericTypeArguments[0]!;
+                    var (dataContract, _) = baseType.GetCustomAttributeRecursevely<DataContractAttribute>();
 
-            // objects
-            #region DataContract and DataMember attributes specified logic. 
-            #warning Todo to extract
-            var valueNs = ValueNs(type);
-            var targetList = GetMembers(type);
-            #endregion
+                    var lst = (IList)obj;
+                    var result = new object[lst.Count];
+                    for (int i = 0; i < lst.Count; i++)
+                    {
+                        var value = lst[i];
+                        result[i] = SerializeObject(XmlNs.A + (dataContract?.Name ?? ReservedTypeName(baseType)), value);
+                    }
+                    return new XElement(name, result);
+                }
+                // Dictionary
+                else if (typeof(Dictionary<,>) == genericType)
+                {
+                    var keyType = type.GenericTypeArguments[0]!;
+                    var valueType = type.GenericTypeArguments[1]!;
+                    var (keyDataContract, _) = keyType.GetCustomAttributeRecursevely<DataContractAttribute>();
+                    var (valueDataContract, _) = valueType.GetCustomAttributeRecursevely<DataContractAttribute>();
+
+                    var dic = (IDictionary)obj;
+                    var result = new List<object>();
+                    foreach (DictionaryEntry kv in dic)
+                    {
+                        result.Add(new XElement(XmlNs.A + $"KeyValueOf{keyDataContract?.Name ?? ReservedTypeName(keyType)}{valueDataContract?.Name ?? ReservedTypeName(valueType)}",
+                            SerializeObject(XmlNs.A + "Key", kv.Key),
+                            SerializeObject(XmlNs.A + "Value", kv.Value)
+                        ));
+                    }
+                    return new XElement(name, result);
+                }
+            }
 
             {
+                // objects
+                #region DataContract and DataMember attributes specified logic. 
+#warning Todo to extract
+                var valueNs = ValueNs(type);
+                var targetList = GetMembers(type);
+                #endregion
+
                 var result = new List<object>();
                 foreach (var (member, dataMember) in targetList)
                 {
@@ -147,25 +223,26 @@ namespace VXs.Xml
         }
     }
 
-    static class MemberInfoExtension {
+    static class MemberInfoExtension
+    {
         public static Func<object?, object?> GetValueMethod(this MemberInfo self) =>
-            self is FieldInfo ? 
+            self is FieldInfo ?
                 ((FieldInfo)self).GetValue :
-            self is PropertyInfo? 
+            self is PropertyInfo ?
                 ((PropertyInfo)self).GetValue :
             throw new NotSupportedException();
 
         static Action<object?, object?> SetValueMethod(this MemberInfo self) =>
-            self is FieldInfo ? 
+            self is FieldInfo ?
                 ((FieldInfo)self).SetValue :
-            self is PropertyInfo? 
+            self is PropertyInfo ?
                 ((PropertyInfo)self).SetValue :
             throw new NotSupportedException();
 
         public static Type MemberInstanceType(this MemberInfo self) =>
-            self is FieldInfo ? 
+            self is FieldInfo ?
                 ((FieldInfo)self).FieldType :
-            self is PropertyInfo? 
+            self is PropertyInfo ?
                 ((PropertyInfo)self).PropertyType :
             throw new NotSupportedException();
 
